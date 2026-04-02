@@ -1,0 +1,134 @@
+﻿@model OAuthHub.Models.ViewModels.ExternalLoginsViewModel
+@{
+    ViewData["Title"] = "Внешние аккаунты";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="text-center mb-4 animate-fade-up">
+            <i class="bi bi-link-45deg display-6 text-success"></i>
+            <h3 class="mt-2">Привязанные аккаунты</h3>
+            <p class="text-muted">Управляйте внешними аккаунтами для входа, синхронизируйте профили и переходите в почтовые сервисы</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.StatusMessage))
+        {
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                @Model.StatusMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (Model.CurrentLogins.Any())
+        {
+            <div class="card border-0 shadow-sm mb-4 animate-fade-up">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-check-circle text-success me-2"></i>Привязанные провайдеры</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    @foreach (var login in Model.CurrentLogins)
+                    {
+                        var iconClass = login.LoginProvider.ToLower() switch
+                        {
+                            "google" => "bi-google text-danger",
+                            "yandex" => "bi-browser-edge text-warning",
+                            "mailru" => "bi-envelope-at text-primary",
+                            _ => "bi-globe text-secondary"
+                        };
+
+                        // Определяем прямую ссылку на почтовый сервис
+                        var mailUrl = login.LoginProvider.ToLower() switch
+                        {
+                            "google" => "https://mail.google.com/",
+                            "yandex" => "https://mail.yandex.ru/",
+                            "mailru" => "https://e.mail.ru/inbox/",
+                            _ => "#"
+                        };
+
+                        <div class="list-group-item d-flex align-items-center justify-content-between py-3">
+                            <div class="d-flex align-items-center">
+                                <i class="bi @iconClass fs-4 me-3"></i>
+                                <div>
+                                    <strong>@login.LoginProvider</strong>
+                                    <br /><small class="text-muted">@(login.ProviderDisplayName ?? login.ProviderKey)</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 align-items-center">
+                                <!-- Кнопка перехода в почтовый сервис -->
+                                @if (mailUrl != "#")
+                                {
+                                    <a href="@mailUrl" target="_blank" class="btn btn-outline-primary btn-sm hover-lift" title="Открыть почтовый ящик в новой вкладке">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> Почта
+                                    </a>
+                                }
+
+                                <form asp-action="SyncProfileData" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="provider" value="@login.LoginProvider" />
+                                    <button type="submit" class="btn btn-outline-success btn-sm hover-lift" title="Обновить имя и аватар из этой сети">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </form>
+
+                                @if (Model.ShowRemoveButton)
+                                {
+                                    <a asp-action="RemoveLogin"
+                                           asp-route-loginProvider="@login.LoginProvider"
+                                           asp-route-providerKey="@login.ProviderKey"
+                                           class="btn btn-outline-danger btn-sm hover-lift" title="Отвязать аккаунт">
+                                        <i class="bi bi-x-lg"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (Model.OtherLogins.Any())
+        {
+            <div class="card border-0 shadow-sm animate-fade-up">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle text-primary me-2"></i>Добавить провайдер</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        @foreach (var provider in Model.OtherLogins)
+                        {
+                            var iconClass = provider.Name.ToLower() switch
+                            {
+                                "google" => "bi-google",
+                                "yandex" => "bi-browser-edge",
+                                "mailru" => "bi-envelope-at",
+                                _ => "bi-globe"
+                            };
+                            var btnClass = provider.Name.ToLower() switch
+                            {
+                                "google" => "btn-outline-danger",
+                                "yandex" => "btn-outline-warning",
+                                "mailru" => "btn-outline-primary",
+                                _ => "btn-outline-secondary"
+                            };
+
+                            <form asp-action="LinkLogin" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="provider" value="@provider.Name" />
+                                <button type="submit" class="btn @btnClass hover-lift">
+                                    <i class="bi @iconClass me-1"></i>Привязать @provider.DisplayName
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="text-center mt-4">
+            <a asp-action="Index" class="btn btn-outline-secondary hover-lift">
+                <i class="bi bi-arrow-left me-1"></i>Назад к профилю
+            </a>
+        </div>
+    </div>
+</div>

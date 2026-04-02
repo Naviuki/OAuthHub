@@ -1,0 +1,66 @@
+﻿@model List<OAuthHub.Models.Entities.ApplicationUser>
+@{
+    ViewData["Title"] = "Управление пользователями";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-people me-2 text-primary"></i> Пользователи системы</h3>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Назад</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Имя / Email</th>
+                    <th>Дата регистрации</th>
+                    <th>Статус</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    bool isBlocked = user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow;
+                    <tr class="@(isBlocked ? "table-danger" : "")">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
+                                    @(user.DisplayName?[0].ToString().ToUpper() ?? "?")
+                                </div>
+                                <div>
+                                    <strong>@user.DisplayName</strong>
+                                    <br /><small class="text-muted">@user.Email</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            @if (isBlocked)
+                            {
+                                <span class="badge bg-danger"><i class="bi bi-lock-fill me-1"></i>Заблокирован</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Активен</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="ToggleBlockUser" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <button type="submit"
+                                        class="btn btn-sm @(isBlocked ? "btn-success" : "btn-outline-danger") hover-lift"
+                                        onclick="return confirm('@(isBlocked ? "Разблокировать этого пользователя?" : "Заблокировать этого пользователя? Все его сессии будут завершены.")" )">
+                                    <i class="bi @(isBlocked ? "bi-unlock-fill" : "bi-lock-fill") me-1"></i>
+                                    @(isBlocked ? "Разблокировать" : "Заблокировать")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

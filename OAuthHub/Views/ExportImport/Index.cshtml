@@ -1,0 +1,76 @@
+﻿@model OAuthHub.Models.ViewModels.ExportDataViewModel
+@{
+    ViewData["Title"] = "Экспорт данных";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-7">
+        <div class="text-center mb-4 animate-fade-up">
+            <i class="bi bi-download display-6 text-secondary"></i>
+            <h3 class="mt-2">Экспорт данных</h3>
+            <p class="text-muted">Скачайте копию ваших данных</p>
+        </div>
+
+        <!-- Data summary -->
+        <div class="card border-0 shadow-sm mb-4 animate-fade-up" style="animation-delay: 0.1s">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-primary"></i>Что будет экспортировано</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="py-2 border-bottom">
+                        <i class="bi bi-person me-2 text-primary"></i>
+                        <strong>Профиль:</strong> @Model.DisplayName (@Model.Email)
+                    </li>
+                    <li class="py-2 border-bottom">
+                        <i class="bi bi-calendar me-2 text-primary"></i>
+                        <strong>Дата регистрации:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")
+                    </li>
+                    <li class="py-2 border-bottom">
+                        <i class="bi bi-link-45deg me-2 text-primary"></i>
+                        <strong>Привязанные провайдеры:</strong>
+                        @if (Model.LinkedProviders.Any())
+                        {
+                            @string.Join(", ", Model.LinkedProviders)
+                        }
+                        else
+                        {
+                            <span class="text-muted">нет</span>
+                        }
+                    </li>
+                    <li class="py-2">
+                        <i class="bi bi-display me-2 text-primary"></i>
+                        <strong>История сессий</strong> (все записи)
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Download buttons -->
+        <div class="card border-0 shadow-sm animate-fade-up" style="animation-delay: 0.2s">
+            <div class="card-body">
+                <h5 class="mb-3"><i class="bi bi-file-earmark-arrow-down me-2"></i>Выберите формат</h5>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <a asp-action="DownloadJson" class="btn btn-primary btn-lg w-100 hover-lift">
+                            <i class="bi bi-filetype-json me-2"></i>Скачать JSON
+                        </a>
+                        <small class="text-muted d-block text-center mt-1">Структурированные данные</small>
+                    </div>
+                    <div class="col-sm-6">
+                        <a asp-action="DownloadCsv" class="btn btn-success btn-lg w-100 hover-lift">
+                            <i class="bi bi-filetype-csv me-2"></i>Скачать CSV
+                        </a>
+                        <small class="text-muted d-block text-center mt-1">Табличный формат</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-controller="Manage" asp-action="Index" class="btn btn-outline-secondary hover-lift">
+                <i class="bi bi-arrow-left me-1"></i>Назад к профилю
+            </a>
+        </div>
+    </div>
+</div>

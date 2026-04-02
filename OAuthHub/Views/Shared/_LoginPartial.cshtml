@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using OAuthHub.Models.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User);
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-1"></i>
+                @(user?.DisplayName ?? user?.Email ?? "Профиль")
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li>
+                    <a class="dropdown-item" asp-controller="Manage" asp-action="Index">
+                        <i class="bi bi-person-gear me-2"></i>Управление профилем
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" asp-controller="Session" asp-action="Index">
+                        <i class="bi bi-display me-2"></i>Сессии
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Выйти
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                <i class="bi bi-box-arrow-in-right me-1"></i>Войти
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Account" asp-action="Register">
+                <i class="bi bi-person-plus me-1"></i>Регистрация
+            </a>
+        </li>
+    }
+</ul>

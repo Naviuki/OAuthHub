@@ -1,0 +1,134 @@
+﻿@model OAuthHub.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 animate-fade-up">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus display-6 text-primary"></i>
+                    <h3 class="mt-2">Создать аккаунт</h3>
+                </div>
+
+                <form asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="DisplayName" class="form-control" placeholder="Имя" autofocus />
+                        <label asp-for="DisplayName"><i class="bi bi-person me-1"></i>Отображаемое имя</label>
+                        <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <label asp-for="Email"><i class="bi bi-envelope me-1"></i>Email</label>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Password" class="form-control" placeholder="Пароль" />
+                        <label asp-for="Password"><i class="bi bi-lock me-1"></i>Пароль</label>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Подтверждение пароля" />
+                        <label asp-for="ConfirmPassword"><i class="bi bi-lock-fill me-1"></i>Подтверждение пароля</label>
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Password strength indicator -->
+                    <div class="mb-3">
+                        <div class="progress" style="height: 4px;">
+                            <div id="passwordStrength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small id="passwordStrengthText" class="text-muted"></small>
+                    </div>
+
+                    <div class="small text-muted mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Пароль должен содержать минимум 8 символов, включая заглавные и строчные буквы и цифры.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-lg hover-lift">
+                        <i class="bi bi-person-plus me-2"></i>Зарегистрироваться
+                    </button>
+                </form>
+
+                @if (Model.ExternalLogins.Any())
+                {
+                    <hr class="my-4" />
+                    <p class="text-center text-muted mb-3">Или зарегистрируйтесь через</p>
+                    <div class="d-flex gap-2 flex-wrap justify-content-center">
+                        @foreach (var provider in Model.ExternalLogins)
+                        {
+                            var iconClass = provider.Name.ToLower() switch
+                            {
+                                "google" => "bi-google",
+                                "yandex" => "bi-browser-edge",
+                                "vkontakte" => "bi-chat-square-heart",
+                                _ => "bi-globe"
+                            };
+                            var btnClass = provider.Name.ToLower() switch
+                            {
+                                "google" => "btn-outline-danger",
+                                "yandex" => "btn-outline-warning",
+                                "vkontakte" => "btn-outline-primary",
+                                _ => "btn-outline-secondary"
+                            };
+
+                            <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="provider" value="@provider.Name" />
+                                <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+                                <button type="submit" class="btn @btnClass hover-lift">
+                                    <i class="bi @iconClass me-1"></i>@provider.DisplayName
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+
+                <div class="text-center mt-4">
+                    <span class="text-muted">Уже есть аккаунт?</span>
+                    <a asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none">
+                        Войти
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Password strength indicator
+        document.getElementById('Password')?.addEventListener('input', function() {
+            const password = this.value;
+            const bar = document.getElementById('passwordStrength');
+            const text = document.getElementById('passwordStrengthText');
+            let strength = 0;
+
+            if (password.length >= 8) strength += 25;
+            if (/[a-z]/.test(password)) strength += 25;
+            if (/[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 25;
+
+            bar.style.width = strength + '%';
+            bar.className = 'progress-bar';
+
+            if (strength <= 25) { bar.classList.add('bg-danger'); text.textContent = 'Слабый'; }
+            else if (strength <= 50) { bar.classList.add('bg-warning'); text.textContent = 'Средний'; }
+            else if (strength <= 75) { bar.classList.add('bg-info'); text.textContent = 'Хороший'; }
+            else { bar.classList.add('bg-success'); text.textContent = 'Надёжный'; }
+
+            if (password.length === 0) { text.textContent = ''; bar.style.width = '0%'; }
+        });
+    </script>
+}

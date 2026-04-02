@@ -1,0 +1,102 @@
+﻿@model OAuthHub.Models.ViewModels.SessionListViewModel
+@{
+    ViewData["Title"] = "Сессии";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="text-center mb-4 animate-fade-up">
+            <i class="bi bi-display display-6 text-info"></i>
+            <h3 class="mt-2">Управление сессиями</h3>
+            <p class="text-muted">Просматривайте активные входы и завершайте подозрительные сессии</p>
+        </div>
+
+        <!-- Terminate all button -->
+        @if (Model.Sessions.Count(s => s.IsActive && !s.IsCurrent) > 0)
+        {
+            <div class="text-end mb-3 animate-fade-up" style="animation-delay: 0.1s">
+                <form asp-action="TerminateAll" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-outline-danger hover-lift"
+                            onclick="return confirm('Завершить все сессии кроме текущей?')">
+                        <i class="bi bi-x-circle me-1"></i>Завершить все другие сессии
+                    </button>
+                </form>
+            </div>
+        }
+
+        <!-- Sessions list -->
+        <div class="list-group shadow-sm">
+            @if (!Model.Sessions.Any())
+            {
+                <div class="list-group-item text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-6"></i>
+                    <p class="mt-2">Нет записей о сессиях</p>
+                </div>
+            }
+
+            @{
+                var index = 0;
+            }
+            @foreach (var session in Model.Sessions)
+            {
+                var animDelay = 0.1 + (index * 0.05);
+                <div class="list-group-item py-3 animate-fade-up @(!session.IsActive ? "bg-light opacity-75" : "")" style="animation-delay: @(animDelay)s">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3 mt-1">
+                                @if (session.IsCurrent)
+                                {
+                                    <span class="badge bg-success rounded-pill">
+                                        <i class="bi bi-check-circle me-1"></i>Текущая
+                                    </span>
+                                }
+                                else if (session.IsActive)
+                                {
+                                    <span class="badge bg-primary rounded-pill">
+                                        <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Активна
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary rounded-pill">Завершена</span>
+                                }
+                            </div>
+                            <div>
+                                <strong>@(session.DeviceInfo ?? "Неизвестное устройство")</strong>
+                                <br />
+                                <small class="text-muted">
+                                    <i class="bi bi-geo-alt me-1"></i>IP: @(session.IpAddress ?? "—")
+                                </small>
+                                <br />
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>Вход: @session.LoginTime.ToString("dd.MM.yyyy HH:mm")
+                                    | Активность: @session.LastActivityTime.ToString("dd.MM.yyyy HH:mm")
+                                </small>
+                            </div>
+                        </div>
+
+                        @if (session.IsActive && !session.IsCurrent)
+                        {
+                            <form asp-action="Terminate" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="sessionId" value="@session.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm hover-lift"
+                                        onclick="return confirm('Завершить эту сессию?')">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+                index++;
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-controller="Manage" asp-action="Index" class="btn btn-outline-secondary hover-lift">
+                <i class="bi bi-arrow-left me-1"></i>Назад к профилю
+            </a>
+        </div>
+    </div>
+</div>

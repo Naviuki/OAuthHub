@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-lg-8 text-center">
+        <div class="animate-fade-up">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="bi bi-shield-lock"></i> OAuthHub
+            </h1>
+            <p class="lead text-muted mb-4">
+                Единый центр аутентификации и управления учётными записями.
+                Входите через Google, Яндекс или MailRu, управляйте сессиями и безопасностью.
+            </p>
+
+            @if (User.Identity?.IsAuthenticated != true)
+            {
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg px-4 hover-lift">
+                        <i class="bi bi-person-plus me-2"></i>Создать аккаунт
+                    </a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-lg px-4 hover-lift">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                    </a>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Manage" asp-action="Index" class="btn btn-primary btn-lg px-4 hover-lift">
+                    <i class="bi bi-person-gear me-2"></i>Перейти в профиль
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="row g-4 py-5">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-lift animate-fade-up" style="animation-delay: 0.1s">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-people fs-4"></i>
+                </div>
+                <h5 class="card-title">OAuth-провайдеры</h5>
+                <p class="card-text text-muted">
+                    Вход через Google, Яндекс и MailRu. Привяжите несколько аккаунтов к одному профилю.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-lift animate-fade-up" style="animation-delay: 0.2s">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-display fs-4"></i>
+                </div>
+                <h5 class="card-title">Управление сессиями</h5>
+                <p class="card-text text-muted">
+                    Просматривайте активные сессии, их IP и устройства. Завершайте подозрительные сессии.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm hover-lift animate-fade-up" style="animation-delay: 0.3s">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-shield-check fs-4"></i>
+                </div>
+                <h5 class="card-title">Безопасность</h5>
+                <p class="card-text text-muted">
+                    Двухфакторная аутентификация, смена пароля, экспорт данных и полное удаление аккаунта.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

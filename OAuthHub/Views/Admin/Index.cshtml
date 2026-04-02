@@ -1,0 +1,94 @@
+﻿@model List<OAuthHub.Models.Entities.AuditLog>
+@{
+    ViewData["Title"] = "Панель администратора";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-primary text-white hover-lift h-100">
+            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Пользователей</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.TotalUsers</h2>
+                </div>
+                <i class="bi bi-people-fill fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-success text-white hover-lift h-100">
+            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Активных сессий</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.ActiveSessions</h2>
+                </div>
+                <i class="bi bi-display-fill fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-secondary text-white hover-lift h-100">
+            <div class="card-body d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <h6 class="text-uppercase mb-2 opacity-75">Записей логов</h6>
+                    <h2 class="mb-0 fw-bold">@ViewBag.TotalLogs</h2>
+                </div>
+                <i class="bi bi-journal-text fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0">Быстрые действия</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a asp-action="Users" class="list-group-item list-group-item-action py-3">
+                    <i class="bi bi-person-gear me-3 text-primary fs-5"></i> Управление пользователями
+                </a>
+                <a asp-action="Sessions" class="list-group-item list-group-item-action py-3">
+                    <i class="bi bi-display me-3 text-success fs-5"></i> Просмотр всех сессий
+                </a>
+                <a asp-action="Logs" class="list-group-item list-group-item-action py-3">
+                    <i class="bi bi-journal-text me-3 text-secondary fs-5"></i> Журнал аудита (Логи)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent py-3">
+                <h5 class="mb-0">Последние 5 событий</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Дата</th>
+                                <th>Пользователь</th>
+                                <th>Действие</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model)
+                            {
+                                <tr>
+                                    <td><small>@log.Timestamp.ToString("dd.MM HH:mm")</small></td>
+                                    <td><small>@log.UserEmail</small></td>
+                                    <td>
+                                        <span class="badge @(log.Action == "Выход" ? "bg-secondary" : "bg-primary")">@log.Action</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

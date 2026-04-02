@@ -1,0 +1,34 @@
+﻿@model OAuthHub.Models.ViewModels.ConfirmActionViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0 animate-fade-up">
+            <div class="card-body p-5 text-center">
+                <i class="bi bi-exclamation-triangle display-3 text-warning mb-3"></i>
+                <h3>@Model.Title</h3>
+                <p class="text-muted my-4">@Model.Description</p>
+
+                <form action="@Model.ConfirmUrl" method="post">
+                    @Html.AntiForgeryToken()
+
+                    @foreach (var field in Model.HiddenFields)
+                    {
+                        <input type="hidden" name="@field.Key" value="@field.Value" />
+                    }
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn @Model.ConfirmButtonCssClass btn-lg hover-lift">
+                            <i class="bi bi-check-lg me-2"></i>@Model.ConfirmButtonText
+                        </button>
+                        <a href="@Model.CancelUrl" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-1"></i>Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

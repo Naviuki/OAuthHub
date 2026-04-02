@@ -1,0 +1,47 @@
+﻿@model OAuthHub.Models.ViewModels.ExternalLoginConfirmationViewModel
+@{
+    ViewData["Title"] = "Завершение регистрации";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0 animate-fade-up">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-check display-6 text-success"></i>
+                    <h3 class="mt-2">Завершение регистрации</h3>
+                    <p class="text-muted">
+                        Вы вошли через <strong>@ViewData["LoginProvider"]</strong>.
+                        Проверьте данные и завершите создание аккаунта.
+                    </p>
+                </div>
+
+                <form asp-action="ExternalLoginConfirmation" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="DisplayName" class="form-control" placeholder="Имя" />
+                        <label asp-for="DisplayName">Отображаемое имя</label>
+                        <span asp-validation-for="DisplayName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <label asp-for="Email">Email</label>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-lg hover-lift">
+                        <i class="bi bi-check-circle me-2"></i>Создать аккаунт
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

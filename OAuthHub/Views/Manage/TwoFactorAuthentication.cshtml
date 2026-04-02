@@ -1,0 +1,73 @@
+﻿@model OAuthHub.Models.ViewModels.Enable2faViewModel
+@{
+    ViewData["Title"] = "Двухфакторная аутентификация";
+    var enabled = (bool)ViewBag.TwoFactorEnabled;
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 animate-fade-up">
+            <div class="card-body p-4">
+                <div class="text-center">
+                    <i class="bi bi-shield-lock display-4 @(enabled ? "text-success" : "text-warning")"></i>
+                    <h3 class="mt-3">Двухфакторная аутентификация</h3>
+                </div>
+
+                @if (enabled)
+                {
+                    <div class="alert alert-success mt-4 text-center">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Защита включена!</strong> При каждом входе будет требоваться код из приложения.
+                    </div>
+
+                    <form asp-action="DisableTwoFactor" method="post" class="mt-3 text-center">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger btn-lg hover-lift" onclick="return confirm('Вы уверены, что хотите отключить 2FA?')">
+                            <i class="bi bi-shield-x me-2"></i>Отключить защиту
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning mt-4 text-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Защита отключена.</strong> Настройте приложение аутентификации.
+                    </div>
+
+                    <div class="border rounded p-3 bg-light mt-3">
+                        <h6><i class="bi bi-1-circle me-2 text-primary"></i>Шаг 1: Добавьте ключ в приложение</h6>
+                        <p class="small text-muted">Откройте Google Authenticator или Яндекс.Ключ и введите этот секретный ключ вручную:</p>
+                        <div class="bg-white p-2 text-center font-monospace border rounded mb-3 fs-5">
+                            <strong>@Model.SharedKey</strong>
+                        </div>
+
+                        <h6><i class="bi bi-2-circle me-2 text-primary"></i>Шаг 2: Введите сгенерированный код</h6>
+                        <form asp-action="EnableTwoFactor" method="post">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="form-floating mb-3">
+                                <input asp-for="Code" class="form-control text-center fs-4 fw-bold" autocomplete="off" placeholder="000000" maxlength="7" />
+                                <label asp-for="Code">Код из приложения</label>
+                                <span asp-validation-for="Code" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-lg w-100 hover-lift">
+                                <i class="bi bi-check-circle me-2"></i>Активировать 2FA
+                            </button>
+                        </form>
+                    </div>
+                }
+
+                <div class="mt-4 text-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Назад в профиль
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
